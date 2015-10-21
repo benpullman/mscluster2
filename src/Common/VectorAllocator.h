@@ -22,7 +22,7 @@ template<class T>
 class AllocatedVector {
 	friend class MyVectorAllocator<T>;
 public:
-	
+
 	const T* const getElementsPtr() const { return elements_; }
 	size_t getSize() const { return size_; }
 	void   setSize(size_t t) { size_ = t; }
@@ -46,7 +46,7 @@ public:
 		if (size_ + size_ < (1<<capacityExp_))
 		{
 			int newSizeExp = 0;
-			while ((size_ >> newSizeExp) != 0) 
+			while ((size_ >> newSizeExp) != 0)
 			{
 				newSizeExp++;
 			}
@@ -71,7 +71,7 @@ public:
 	{
 		if (size_== 0 || e > elements_[size_-1])
 			return MAX_SIZE_T;
-		if (e<elements_[0])	
+		if (e<elements_[0])
 			return 0;
 
 		const size_t dis = distance(elements_, lower_bound(elements_, elements_ + size_, e));
@@ -116,10 +116,10 @@ public:
 			delete [] vectorMemBlocks_[i];
 	}
 
-	AllocatedVector<T>* allocateVector() 
-	{ 
+	AllocatedVector<T>* allocateVector()
+	{
 		if (availableVectors_.size() == 0)
-			allocateMoreVectors(); 
+			allocateMoreVectors();
 		AllocatedVector<T>* v = availableVectors_.back();
 		availableVectors_.pop_back();
 		v->elements_ = 0;
@@ -128,17 +128,17 @@ public:
 		return v;
 	}
 
-	AllocatedVector<T>* allocateVector(size_t size) 
+	AllocatedVector<T>* allocateVector(size_t size)
 	{
 		AllocatedVector<T>* v=allocateVector();
 		size_t sizeExp = 0;
-		while ((size >> sizeExp) != 0) 
+		while ((size >> sizeExp) != 0)
 		{
 			sizeExp++;
 		}
-		v.elements_ = getArray(sizeExp);
-		v.size_     = 0;
-		v.capacityExp_ = sizeExp;
+		v->elements_ = getArray(sizeExp);
+		v->size_     = 0;
+		v->capacityExp_ = sizeExp;
 		return v;
 	}
 
@@ -177,17 +177,17 @@ public:
 			}
 		cout << endl;
 	}
-	
+
 private:
 
 	unsigned int minSizeExp_;
 	size_t memBlockSize_;
-	size_t numVectorsInBlock_; // size of batch of AllocatedVectors that are created with each memory allocation 
+	size_t numVectorsInBlock_; // size of batch of AllocatedVectors that are created with each memory allocation
 
 	vector<T*> arrayMemBlocks_;			// bulk memory is allocated with new
 	vector< vector< T* > > availableArrays_; // first dim is size exponent, for each size t holds pointers
 											// to buffers of 2^t elements of type T
-	
+
 	vector< AllocatedVector<T>* > vectorMemBlocks_;  // bulk memory is allocated with new
 	vector< AllocatedVector<T>* > availableVectors_; // holds pointers to individual AllocatedVector that can be given
 
@@ -200,7 +200,7 @@ private:
 				" bytes for " << numVectorsInBlock_ << " vector blocks." << endl;
 			exit(1);
 		}
-		
+
 		vectorMemBlocks_.push_back(p);
 		availableVectors_.reserve(availableVectors_.size() + numVectorsInBlock_);
 
@@ -268,7 +268,3 @@ private:
 
 
 #endif
-
-
-
-
