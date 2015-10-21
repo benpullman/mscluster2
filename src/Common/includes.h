@@ -26,6 +26,7 @@
 #include <map>
 #include <time.h>
 #include <assert.h>
+#include <unistd.h>
 
 
 
@@ -40,7 +41,7 @@ using std::vector;
 	public:
 		explicit my_vector(const A& al = A()) : vector<T,A> (al) {}
 		explicit my_vector(size_type n, const T& v = T(), const A& al = A()) : vector<T,A>(n, v, al) {}
-		
+
 		my_vector(const my_vector& x) : vector<T,A>(x) {}
 		my_vector(const_iterator first, const_iterator last, const A& al = A()) : vector<T,A>(first, last, al) {}
 
@@ -48,7 +49,7 @@ using std::vector;
 		{
 			return at(pos);
 		}
-		
+
 		reference operator[](size_type pos)
 		{
 			return at(pos);
@@ -74,7 +75,7 @@ const value_t		MIN_VALUE_T = numeric_limits<value_t>::min();
 const weight_t		MAX_WEIGHT_T = numeric_limits<weight_t>::max();
 const weight_t		MIN_WEIGHT_T = numeric_limits<weight_t>::min();
 
-const float NON_FLOAT   (static_cast<float>(1.1231231e36) - numeric_limits<float>::max()); // my float value that is considered 
+const float NON_FLOAT   (static_cast<float>(1.1231231e36) - numeric_limits<float>::max()); // my float value that is considered
 
 #define BYTEORDER_LITTLE_ENDIAN
 
@@ -86,5 +87,3 @@ const float NON_FLOAT   (static_cast<float>(1.1231231e36) - numeric_limits<float
 
 
 #endif
-
-
