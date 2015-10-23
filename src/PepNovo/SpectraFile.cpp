@@ -23,7 +23,7 @@ void SpectraFile::tallySpectraStats()
 	maxSpectrumCharge_ = NEG_INF;
 	minSpectrumMz_ = POS_INF;
 	maxSpectrumMz_ = NEG_INF;
-	
+
 	int i;
 	for (i=0; i<headers_.size(); i++)
 	{
@@ -36,7 +36,7 @@ void SpectraFile::tallySpectraStats()
 		}
 		else if (ssh.getCharge() < minSpectrumCharge_)
 			minSpectrumCharge_=  ssh.getCharge();
-		
+
 		spectraCountsPerCharge_[ssh.getCharge()]++;
 
 		if (ssh.getMOverZ() < minSpectrumMz_)
@@ -48,7 +48,7 @@ void SpectraFile::tallySpectraStats()
 }
 
 
-int SpectraFile::scanFile(const char *filePath, int datasetIdx, int fileIndexInList, 
+int SpectraFile::scanFile(const char *filePath, int datasetIdx, int fileIndexInList,
 						  const Config* config, bool removeDuplicates, bool overwriteExisitngLocations)
 {
 	fileType_ = getFileExtensionType(filePath);
@@ -57,7 +57,7 @@ int SpectraFile::scanFile(const char *filePath, int datasetIdx, int fileIndexInL
 	// if this is a zip file, try unzipping it and using the unzipped file instead
 	unzippedFilePath_ = std::string();
 	if (fileType_ == IFT_ZIP)
-	{	
+	{
 		vector<string> unzippedPaths;
 		size_t numUnzips = unzipSingleFile(filePath_, unzippedPaths);
 		if (numUnzips == 0)
@@ -86,7 +86,7 @@ int SpectraFile::scanFile(const char *filePath, int datasetIdx, int fileIndexInL
 	}
 	else if (fileType_ == IFT_DTA)
 	{
-		scanDtaFile((unzippedFilePath_.length() ? unzippedFilePath_.c_str() : filePath), 
+		scanDtaFile((unzippedFilePath_.length() ? unzippedFilePath_.c_str() : filePath),
 					 datasetIdx, fileIndexInList, config, removeDuplicates);
 	}
 	else if (fileType_ == IFT_MS2)
@@ -118,13 +118,13 @@ int	SpectraFile::scanDtaFile(const char *filePath, int datasetIdx, int fileIndex
 	{
 		SingleSpectrumHeader ssh;
 		ssh.setFileType(IFT_DTA);
-		
+
 		if (! ssh.scanSpectrumHeader(dtaStream, config))
 		{
 			char tmpBuff[256];
 			if (! fgets(tmpBuff,256,dtaStream)) // move forwards, there was a problem with that position
 				break;							// reached eof
-				
+
 			continue;
 		}
 
@@ -136,8 +136,8 @@ int	SpectraFile::scanDtaFile(const char *filePath, int datasetIdx, int fileIndex
 		if (ssh.getScanNumber() == MIN_INT)
 			ssh.setScanNumber(ssh.getIndexInFile());
 
-		if (removeDuplicates && 
-			headers_.size()>0 && 
+		if (removeDuplicates &&
+			headers_.size()>0 &&
 			headers_.back().getScanNumber()>=0 &&
 			headers_.back().getScanNumber() == ssh.getScanNumber())
 		{
@@ -151,7 +151,7 @@ int	SpectraFile::scanDtaFile(const char *filePath, int datasetIdx, int fileIndex
 
 	if (numSkipped>0)
 		cout << " [ Skipped " << numSkipped << " doubles ] ";
-	
+
 	return counter;
 }
 
@@ -172,13 +172,13 @@ int	SpectraFile::scanMs2File(const char *filePath, int datasetIdx, int fileIndex
 	{
 		SingleSpectrumHeader ssh;
 		ssh.setFileType(IFT_MS2);
-		
+
 		if (! ssh.scanSpectrumHeader(ms2Stream, config))
 		{
 			char tmpBuff[256];
 			if (! fgets(tmpBuff,256,ms2Stream)) // move forwards, there was a problem with that position
 				break;							// reached eof
-				
+
 			continue;
 		}
 
@@ -189,8 +189,8 @@ int	SpectraFile::scanMs2File(const char *filePath, int datasetIdx, int fileIndex
 		if (ssh.getScanNumber() == MIN_INT)
 			ssh.setScanNumber(ssh.getIndexInFile());
 
-		if (removeDuplicates && 
-			headers_.size()>0 && 
+		if (removeDuplicates &&
+			headers_.size()>0 &&
 			headers_.back().getScanNumber()>=0 &&
 			headers_.back().getScanNumber() == ssh.getScanNumber())
 		{
@@ -204,7 +204,7 @@ int	SpectraFile::scanMs2File(const char *filePath, int datasetIdx, int fileIndex
 
 	if (numSkipped>0)
 		cout << " [ Skipped " << numSkipped << " doubles ] ";
-	
+
 	return counter;
 }
 
@@ -224,13 +224,13 @@ int SpectraFile::scanMgfFile(const char* filePath, int datasetIdx, int fileIndex
 	{
 		SingleSpectrumHeader ssh;
 		ssh.setFileType(IFT_MGF);
-		
+
 		if (! ssh.scanSpectrumHeader(mgfStream, config))
 		{
 			char tmpBuff[256];
 			if (! fgets(tmpBuff,256,mgfStream)) // move forwards, there was a problem with that position
 				break;							// reached eof
-				
+
 			continue;
 		}
 
@@ -248,8 +248,8 @@ int SpectraFile::scanMgfFile(const char* filePath, int datasetIdx, int fileIndex
 		if (ssh.getScanNumber() == MIN_INT)
 			ssh.setScanNumber(ssh.getIndexInFile());
 
-		if (removeDuplicates && 
-			headers_.size()>0 && 
+		if (removeDuplicates &&
+			headers_.size()>0 &&
 			headers_.back().getScanNumber()>=0 &&
 			headers_.back().getScanNumber() == ssh.getScanNumber())
 			continue;
@@ -257,7 +257,7 @@ int SpectraFile::scanMgfFile(const char* filePath, int datasetIdx, int fileIndex
 		headers_.push_back(ssh);
 	}
 	fclose(mgfStream);
-	
+
 	return counter;
 }
 
@@ -274,7 +274,7 @@ int SpectraFile::scanMzxmlFile(const char* filePath, int datasetIdx, int fileInd
     static char* buffer = 0;
 	if (! buffer)
 		buffer = (char*)calloc(XML_BUFFER_SIZE + 1, sizeof(char));
- 
+
 	FILE* mzxmlStream=fopen(filePath,"rb");
 	if (! mzxmlStream)
 	{
@@ -354,7 +354,7 @@ int SpectraFile::scanMzxmlFile(const char* filePath, int datasetIdx, int fileInd
 
 		char * retentionTimeStr = strstr(scanStr,"retentionTime=\"PT");
 		const mass_t retentionTime = (retentionTimeStr ? parseMassFromXml(retentionTimeStr) : -1.0);
-		
+
 		char* peakCountStr = strstr(scanStr, "peaksCount=\"");
 		if (!peakCountStr)
 		{
@@ -362,14 +362,14 @@ int SpectraFile::scanMzxmlFile(const char* filePath, int datasetIdx, int fileInd
 			cout << "Scan: " << scanNumber << "  Pos: " << currentFilePos << endl;
 			scanStartPtr += 50;
 			continue;
-			
+
 		}
 		const int peakCount = parseIntFromXml(peakCountStr);
-	
+
         char* msLevelStr = strstr(scanStr, "msLevel=");
         if (! msLevelStr)
         {
-            cout << "Warning: mzXML parser encountered a scan with no MS level!" << endl; 
+            cout << "Warning: mzXML parser encountered a scan with no MS level!" << endl;
 			cout << "Scan: " << scanNumber << "  Pos: " << currentFilePos << endl;
             scanStartPtr += 50;
 			continue;
@@ -380,7 +380,7 @@ int SpectraFile::scanMzxmlFile(const char* filePath, int datasetIdx, int fileInd
 			scanStartPtr = msLevelStr + 20;
 			continue;
 		}
-        
+
 		char* precursorIntensityStr = strstr(scanStr,"precursorIntensity=");
 		if (! precursorIntensityStr)
 		{
@@ -388,26 +388,32 @@ int SpectraFile::scanMzxmlFile(const char* filePath, int datasetIdx, int fileInd
 			continue;
 		}
 		const intensity_t precursorIntensity = parseMassFromXml(precursorIntensityStr);
-		
+
 		char* precursorMzStr = strstr(scanStr, "<precursorMz");
 		if (!precursorMzStr && msLevel > 1)
 		{
-		
+
 			cout << "Warning: mzXML parser encountered a scan with no m/z" << endl;
 			cout << "Scan: " << scanNumber << "  Pos: " << currentFilePos << endl;
             scanStartPtr += 50;
 			continue;
 		}
 
+		char* chargeStr = strstr(precursorMzStr, "precursorCharge=");
+
+		const int charge = parseIntFromXml(chargeStr);
+
 		precursorMzStr = strstr(precursorMzStr, ">");
+
 		const mass_t precursorMZ = parseMassFromXml(precursorMzStr);
 
-        if (msLevel <= 1 || scanNumber < 0 || peakCount < 7)
+    if (msLevel <= 1 || scanNumber < 0 || peakCount < 7)
 		{
 			scanStartPtr += 50;
 			continue;
 		}
-        
+
+
 		char* peakStr = strstr(precursorMzStr, "<peaks");
 		if (! peakStr)
 		{
@@ -427,14 +433,16 @@ int SpectraFile::scanMzxmlFile(const char* filePath, int datasetIdx, int fileInd
 		ssh.setOriginalNumPeaks(peakCount);
 		ssh.setMsLevel(msLevel);
 		ssh.setPositionInFile(static_cast<long>(bufferStartOffset + (peakStr - buffer)));
+		// ssh.setCharge(charge);
 
-		bool skip =(removeDuplicates && 
-					headers_.size()>0 && 
+
+		bool skip =(removeDuplicates &&
+					headers_.size()>0 &&
 					headers_.back().getScanNumber()>=0 &&
 					headers_.back().getScanNumber() == ssh.getScanNumber());
 		if (! skip)
 			headers_.push_back(ssh);
-		
+
 		scanStartPtr = peakStr + 8 * peakCount;
 
 		if (scanStartPtr>=buffer+XML_BUFFER_SIZE)
@@ -455,13 +463,13 @@ Should be used when DAT file is read as input for non-clustering applications
 of the header to the one given as an argument to the function.
 Since Dat files are a special case, we use the DatFile class to do the processing
 ********************************************************************************/
-int	SpectraFile::scanDatFile(const char *filePath, int datasetIdx, int fileIndexInList, 
+int	SpectraFile::scanDatFile(const char *filePath, int datasetIdx, int fileIndexInList,
 							 const Config* config, bool indOverwriteDatLocation)
 {
 	DatFile dat;
 
 	dat.openForReading(filePath);
-	
+
 	size_t totalSpectraRead = 0;
 	size_t numBytes = 0;
 	float  sqs;
@@ -485,7 +493,7 @@ int	SpectraFile::scanDatFile(const char *filePath, int datasetIdx, int fileIndex
 			ssh.setSpectraFileIndexInList(fileIndexInList);
 			ssh.setDatasetIndex(datasetIdx);
 		}
-		
+
 		headers_.push_back(ssh);
 	}
 
@@ -495,7 +503,7 @@ int	SpectraFile::scanDatFile(const char *filePath, int datasetIdx, int fileIndex
 
 
 
-int	SpectraFile::readPeakList(FILE* stream, const SingleSpectrumHeader* header, 
+int	SpectraFile::readPeakList(FILE* stream, const SingleSpectrumHeader* header,
 							 Peak* peaks, const Config* config) const
 {
 	int numPeaksRead =0;
@@ -535,11 +543,11 @@ int	SpectraFile::readPeakList(FILE* stream, const SingleSpectrumHeader* header,
 }
 
 
-int SpectraFile::readDtaPeakList(FILE* stream, const SingleSpectrumHeader* header, 
+int SpectraFile::readDtaPeakList(FILE* stream, const SingleSpectrumHeader* header,
 								Peak* peaks, const Config* config) const
 {
 	assert(header->getFileType() == IFT_DTA);
-	
+
 
 	mass_t		mass=-1.0;
 	intensity_t intensity=-1.0;
@@ -563,17 +571,17 @@ int SpectraFile::readDtaPeakList(FILE* stream, const SingleSpectrumHeader* heade
 				break;
 
 		istringstream is(buffer);
-				
+
 		mass_t mass = -1.0;
 		intensity_t intensity = -1.0;
 
 		is >> mass >> intensity;
-	
+
 		if (mass <=0.0 || intensity<0)   // the peak probably got rounded down
 			continue;
 
-		// a fix to avoid problems with "0" intensity peaks 
-		if (intensity == 0.0) 
+		// a fix to avoid problems with "0" intensity peaks
+		if (intensity == 0.0)
 			intensity = 1E-9;
 
 		peaks[peakCount].mass		= mass;
@@ -585,11 +593,11 @@ int SpectraFile::readDtaPeakList(FILE* stream, const SingleSpectrumHeader* heade
 	return peakCount;
 }
 
-int SpectraFile::readMs2PeakList(FILE* stream, const SingleSpectrumHeader* header, 
+int SpectraFile::readMs2PeakList(FILE* stream, const SingleSpectrumHeader* header,
 								Peak* peaks, const Config* config) const
 {
 	assert(header->getFileType() == IFT_MS2);
-	
+
 	mass_t		mass=-1.0;
 	intensity_t intensity=-1.0;
 	char buffer[256];
@@ -612,17 +620,17 @@ int SpectraFile::readMs2PeakList(FILE* stream, const SingleSpectrumHeader* heade
 				break;
 
 		istringstream is(buffer);
-				
+
 		mass_t mass = -1.0;
 		intensity_t intensity = -1.0;
 
 		is >> mass >> intensity;
-	
+
 		if (mass <=0.0 || intensity<0)   // the peak probably got rounded down
 			continue;
 
-		// a fix to avoid problems with "0" intensity peaks 
-		if (intensity == 0.0) 
+		// a fix to avoid problems with "0" intensity peaks
+		if (intensity == 0.0)
 			intensity = 1E-9;
 
 		peaks[peakCount].mass		= mass;
@@ -635,7 +643,7 @@ int SpectraFile::readMs2PeakList(FILE* stream, const SingleSpectrumHeader* heade
 }
 
 
-int SpectraFile::readMgfPeakList(FILE* stream, const SingleSpectrumHeader* header, 
+int SpectraFile::readMgfPeakList(FILE* stream, const SingleSpectrumHeader* header,
 								 Peak* peaks, const Config* config) const
 {
 	assert (header->getFileType() == IFT_MGF);
@@ -661,7 +669,7 @@ int SpectraFile::readMgfPeakList(FILE* stream, const SingleSpectrumHeader* heade
 		if (mass>=0.0 &&  intensity>=0.0)
 			break;
 	}
-	
+
 	peaks[0].mass = mass;
 	peaks[0].intensity = intensity;
 
@@ -680,17 +688,17 @@ int SpectraFile::readMgfPeakList(FILE* stream, const SingleSpectrumHeader* heade
 			break;
 
 		istringstream is(buffer);
-				
+
 		mass_t mass = -1.0;
 		intensity_t intensity = -1.0;
 
 		is >> mass >> intensity;
-	
+
 		if (mass <=0.0 || intensity<0.0)   // the peak probably got rounded down
 			continue;
 
-		// a fix to avoid problems with "0" intensity peaks 
-		if (intensity == 0.0) 
+		// a fix to avoid problems with "0" intensity peaks
+		if (intensity == 0.0)
 			intensity = 1E-9;
 
 		peaks[peakCount].mass		= mass;
@@ -703,9 +711,9 @@ int SpectraFile::readMgfPeakList(FILE* stream, const SingleSpectrumHeader* heade
 
 
 
-int SpectraFile::readMzxmlPeakList(FILE* stream, 
-								   const SingleSpectrumHeader* header, 
-								   Peak* peaks, 
+int SpectraFile::readMzxmlPeakList(FILE* stream,
+								   const SingleSpectrumHeader* header,
+								   Peak* peaks,
 								   const Config* config) const
 {
 	static char*  buffer = 0;
@@ -714,11 +722,11 @@ int SpectraFile::readMzxmlPeakList(FILE* stream,
     static size_t maxNumPeaks = 0;
 
 	const size_t peakCount = header->getOriginalNumPeaks();
-	
+
 	if (maxNumPeaks < peakCount)
 	{
 		maxNumPeaks = 200 + 2 * peakCount;
-		
+
 		if (buffer)
 			delete(buffer);
 		if (decodedPeakBuffer)
@@ -758,7 +766,7 @@ int SpectraFile::readMzxmlPeakList(FILE* stream,
 		}
 	}
 	peakStr = strstr(peakStr, ">");
-	
+
 	if (!peakStr)
 		return 0;
 
@@ -816,7 +824,7 @@ int SpectraFile::readMzxmlPeakList(FILE* stream,
 		intensity_t totalIntensity=0.0;
 		for (size_t i=0; i<peakIdx; i++)
 			totalIntensity += peaks[i].intensity;
-		
+
 		if (totalIntensity <= 0.0) // do not use this spectrum
 			return 0;
 
@@ -831,9 +839,9 @@ int SpectraFile::readMzxmlPeakList(FILE* stream,
 
 
 
-int	SpectraFile::readDatPeakList(FILE* stream, 
-								 const SingleSpectrumHeader* header, 
-								 Peak* peaks, 
+int	SpectraFile::readDatPeakList(FILE* stream,
+								 const SingleSpectrumHeader* header,
+								 Peak* peaks,
 								 const Config* config) const
 {
 	if (fread(peaks, sizeof(Peak), header->getOriginalNumPeaks(), stream) != header->getOriginalNumPeaks())
@@ -849,4 +857,3 @@ void SpectraFile::setAlldatasetIdxs(int idx)
 	for (size_t i=0; i<headers_.size(); i++)
 		headers_[i].setDatasetIndex(idx);
 }
-

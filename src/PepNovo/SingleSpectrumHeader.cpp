@@ -3,7 +3,7 @@
 #include "PepNovo_auxfun.h"
 
 
-
+ 
 
 
 bool SingleSpectrumHeader::scanSpectrumHeader(FILE* stream, const Config* config)
@@ -30,7 +30,7 @@ bool	SingleSpectrumHeader::scanSpectrumHeaderFromBuffer(const char* buffer, cons
 	// initialize fields that might not get assigned when reading
 	scanNumber_ = MIN_INT;
 	spectraFileIndexInList_ = MIN_INT;
-	
+
 	if (fileType_ == IFT_DAT)
 		return (scanDatSpectrumHeaderFromBuffer(buffer, config));
 
@@ -58,7 +58,7 @@ bool	SingleSpectrumHeader::scanDatSpectrumHeaderFromBuffer(const char* buffer, c
 	const unsigned int* ui = reinterpret_cast<const unsigned int*>(buffer);
 	unsigned int spectrumSize = *ui++;
 	originalNumPeaks_ = *ui++;
-	
+
 	const mass_t* mt = reinterpret_cast<const mass_t*>(ui);
 	mOverZ_ = *mt++;
 	originalPmWith19_ = *mt++;
@@ -68,20 +68,20 @@ bool	SingleSpectrumHeader::scanDatSpectrumHeaderFromBuffer(const char* buffer, c
 	const short* sh = reinterpret_cast<const short*>(mt);
 	charge_   = *sh++;
 	fileType_ = *sh++;
-	msLevel_  = *sh++; 
-	
-	
+	msLevel_  = *sh++;
+
+
 	const int* ip = reinterpret_cast<const int*>(sh);
 	scanNumber_ = *ip++;
 	clusterSize_ = *ip++;
 	spectraFileIndexInList_ = *ip++;
 	datasetIndex_   		= *ip++;
-	
+
 	const float* fp = reinterpret_cast<const float*>(ip);
 	retentionTime_ = *fp++;
 	precursorIntensity_ = *fp++;
 	sqs_ = *fp++;
-	
+
 	sh = reinterpret_cast<const short*>(fp);
 	const short titleLength = *sh++;
 	char* p = reinterpret_cast<char*>(const_cast<short*>(sh));
@@ -95,7 +95,7 @@ bool	SingleSpectrumHeader::scanDatSpectrumHeaderFromBuffer(const char* buffer, c
 	}
 	else
 		title_ = std::string();
-	
+
 	sh = reinterpret_cast<const short*>(p);
 	const short peptideLength = *sh++;
 
@@ -107,7 +107,7 @@ bool	SingleSpectrumHeader::scanDatSpectrumHeaderFromBuffer(const char* buffer, c
 		const char lastChar = p[peptideLength-1];
 		if (lastChar == '\n' || lastChar == '\r' || lastChar == '\t' || lastChar == ' ')
 			p[peptideLength-1]='\0';
-		
+
 		peptideStr_ = p;
 		p[peptideLength] = t;
 		p += peptideLength;
@@ -117,7 +117,7 @@ bool	SingleSpectrumHeader::scanDatSpectrumHeaderFromBuffer(const char* buffer, c
 
 	assert(scanNumber_ == MIN_INT || scanNumber_ >=0);
 	assert(originalNumPeaks_>0);
-	return true;	
+	return true;
 }
 
 
@@ -181,11 +181,11 @@ bool SingleSpectrumHeader::scanDtaSpectrumHeader(FILE* dtaStream, const Config* 
 			precursorIntensity_ += p.intensity;
 			originalNumPeaks_++;
 		}
-		
+
 		if (precursorIntensity_>0.0)
 			return true;
 	}
-	
+
 	return false;
 }
 
@@ -259,11 +259,11 @@ bool SingleSpectrumHeader::scanMs2SpectrumHeader(FILE* ms2Stream, const Config* 
 			precursorIntensity_ += p.intensity;
 			originalNumPeaks_++;
 		}
-		
+
 		if (precursorIntensity_>0.0)
 			return true;
 	}
-	
+
 	return false;
 }
 
@@ -283,7 +283,7 @@ bool SingleSpectrumHeader::scanMgfSpectrumHeader(FILE* mgfStream, const Config* 
 		break;
 	}
 
-	
+
 	positionInFile_ = ftell(mgfStream);
 	precursorIntensity_ = 0.0;
 	intensity_t firstPeakIntensity=0.0;
@@ -312,7 +312,7 @@ bool SingleSpectrumHeader::scanMgfSpectrumHeader(FILE* mgfStream, const Config* 
 			buffer[len]='\0';
 			if (buffer[len-1]=='\r' || buffer[len-1]=='\n' )
 				buffer[len-1]='\0';
-			
+
 			string titleStr = buffer + 6;
 			setTitle(titleStr);
 
@@ -324,7 +324,7 @@ bool SingleSpectrumHeader::scanMgfSpectrumHeader(FILE* mgfStream, const Config* 
 			{
 				len = title_.length();
 				if (len>7 &&
-					title_[len-1] == 'a' && title_[len-2] == 't' && title_[len-3]=='d' && 
+					title_[len-1] == 'a' && title_[len-2] == 't' && title_[len-3]=='d' &&
 					title_[len-6] == '.' && title_[len-4]== '.')
 				{
 					int pos = len-7;
@@ -347,7 +347,7 @@ bool SingleSpectrumHeader::scanMgfSpectrumHeader(FILE* mgfStream, const Config* 
 								scanString[i]=' ';
 								break;
 							}
-						
+
 						istringstream iss(scanString);
 						int scan1=-1, scan2=-1;
 						iss >> scan1 >> scan2;
@@ -362,13 +362,13 @@ bool SingleSpectrumHeader::scanMgfSpectrumHeader(FILE* mgfStream, const Config* 
 		if (! strncmp(buffer,"SEQ=",4) )
 		{
 			peptideStr_ = buffer+4;
-			continue;		
+			continue;
 		}
 		else
 		if (! strncmp(buffer,"PEPSEQ=",7) )
 		{
 			peptideStr_ = buffer+7;
-			continue;		
+			continue;
 		}
 		else
 		if (! strncmp(buffer,"SCAN=",5) )
@@ -430,7 +430,7 @@ bool SingleSpectrumHeader::scanMgfSpectrumHeader(FILE* mgfStream, const Config* 
 			}
 			continue;
 		}
-		else	
+		else
 		if ( ! strncmp(buffer,"CHARGE=",6))
 		{
 			int c;
@@ -446,12 +446,12 @@ bool SingleSpectrumHeader::scanMgfSpectrumHeader(FILE* mgfStream, const Config* 
 		{
 			istringstream is(buffer+8);
 			is >> mOverZ_;
-			
+
 			if (mOverZ_ < 0)
 			{
 				cout << "Error: reading pepmass:" << mOverZ_ << endl;
 				return false;
-			}		
+			}
 		}
 		else // is this a peak?
 		{
@@ -481,7 +481,7 @@ bool SingleSpectrumHeader::scanMgfSpectrumHeader(FILE* mgfStream, const Config* 
 	pmWith19_ = originalPmWith19_;
 
 
-	
+
 	originalNumPeaks_=1;
 
 	if (precursorIntensity_ > 0.0)
@@ -543,7 +543,7 @@ bool SingleSpectrumHeader::scanMgfSpectrumHeader(FILE* mgfStream, const Config* 
 						return true;
 					}
 				}
-			
+
 
 				cout << "Warning: MGF sequence mass doesn't add up: " << title_ << " (diff: "
 					 << diff << ")" <<  endl;
@@ -563,7 +563,7 @@ void SingleSpectrumHeader::printStats(const Config *config, ostream& os, bool pr
 {
 	if (fileType_ == IFT_MGF)
 	{
-		os << ">> " << spectraFileIndexInList_<< " " << (scanNumber_ > MIN_INT ? scanNumber_ :  indexInFile_) << 
+		os << ">> " << spectraFileIndexInList_<< " " << (scanNumber_ > MIN_INT ? scanNumber_ :  indexInFile_) <<
 			" " << title_;
 	}
 	else if (fileType_ == IFT_MZXML)
@@ -573,7 +573,7 @@ void SingleSpectrumHeader::printStats(const Config *config, ostream& os, bool pr
 	else if (fileType_ == IFT_DAT)
 	{
 		os << ">> " << spectraFileIndexInList_ << " " << scanNumber_;
-	}	
+	}
 	else
 		os << ">> " << spectraFileIndexInList_ << " " << title_;
 
@@ -585,7 +585,7 @@ void SingleSpectrumHeader::printStats(const Config *config, ostream& os, bool pr
 
 	if (print_endl)
 		os << endl;
-	
+
 }
 
 size_t  SingleSpectrumHeader::writeHeaderToDatBuffer(char* buffer) const
@@ -608,18 +608,18 @@ size_t  SingleSpectrumHeader::writeHeaderToDatBuffer(char* buffer) const
 	*sh++ = charge_;
 	*sh++ = static_cast<short>(IFT_DAT);
 	*sh++ =	msLevel_;
-	
+
 	int* ip = reinterpret_cast<int*>(sh);
 	*ip++ = scanNumber_;
 	*ip++ = clusterSize_;
 	*ip++ = spectraFileIndexInList_;
 	*ip++ = datasetIndex_;
-	
+
 	float *fp = reinterpret_cast<float*>(ip);
 	*fp++ = retentionTime_;
 	*fp++ = precursorIntensity_;
 	*fp++ = sqs_;
-	
+
 	sh = reinterpret_cast<short*>(fp);
 	*sh++ = title_.length();
 	char* p = reinterpret_cast<char*>(sh);
@@ -664,17 +664,17 @@ size_t  SingleSpectrumHeader::writeHeaderToMgfBuffer(char* buffer) const
 
 	if (retentionTime_>0.0)
 		oss << "RTINSECONDS=" << retentionTime_ << endl;
-	
+
 	if (clusterSize_>0)
 		oss << "CLUSTER_SIZE=" << clusterSize_ << endl;
 
 	if (precursorIntensity_>0.0)
 		oss << "PRECURSOR_INTENSITY=" << scientific << precursorIntensity_ << endl;
-	
+
 	oss << "CHARGE=" << charge_ << "+" << endl;
-	
+
 	oss << "PEPMASS=" << fixed << setprecision(NUM_SIG_DIGITS) << mOverZ_ << endl;
-		
+
 	const size_t len = oss.str().length();
 	memcpy(buffer,oss.str().c_str(), len);
 
@@ -685,7 +685,7 @@ void SingleSpectrumHeader::printStats(ostream& os, bool print_endl) const
 {
 	if (fileType_ == IFT_MGF)
 	{
-		os << ">> " << spectraFileIndexInList_<< " " << (scanNumber_ > MIN_INT ? scanNumber_ :  indexInFile_) << 
+		os << ">> " << spectraFileIndexInList_<< " " << (scanNumber_ > MIN_INT ? scanNumber_ :  indexInFile_) <<
 			" " << title_;
 	}
 	else if (fileType_ == IFT_MZXML)
@@ -695,7 +695,7 @@ void SingleSpectrumHeader::printStats(ostream& os, bool print_endl) const
 	else if (fileType_ == IFT_DAT)
 	{
 		os << ">> " << spectraFileIndexInList_ << " " << scanNumber_;
-	}	
+	}
 	else if (fileType_ == IFT_DTA)
 	{
 		os << ">> " << spectraFileIndexInList_ << " " << indexInFile_;
@@ -711,10 +711,5 @@ void SingleSpectrumHeader::printStats(ostream& os, bool print_endl) const
 	os << "\t" << setprecision(4) << fixed << mOverZ_;
 
 	if (print_endl)
-		os << endl;	
+		os << endl;
 }
-
-
-
-
-
