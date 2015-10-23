@@ -433,7 +433,7 @@ int SpectraFile::scanMzxmlFile(const char* filePath, int datasetIdx, int fileInd
 		ssh.setOriginalNumPeaks(peakCount);
 		ssh.setMsLevel(msLevel);
 		ssh.setPositionInFile(static_cast<long>(bufferStartOffset + (peakStr - buffer)));
-		// ssh.setCharge(charge);
+		ssh.setCharge(charge);
 
 
 		bool skip =(removeDuplicates &&
