@@ -11,7 +11,7 @@ MsClusterDataStorage::~MsClusterDataStorage()
 }
 
 
-void MsClusterDataStorage::initialize(MsParameterStruct* params, 
+void MsClusterDataStorage::initialize(MsParameterStruct* params,
 									  const Config* config,
 									  const MsSimilarityModel* simModel)
 {
@@ -40,7 +40,7 @@ void MsClusterDataStorage::initialize(MsParameterStruct* params,
 
 	if (verboseLevel_>0)
 		cout << endl << "Initalizing storage, examining dat files..." << endl;
-	
+
 	oss.str("");
 
 	if (params->gotMergeArchives)
@@ -51,7 +51,7 @@ void MsClusterDataStorage::initialize(MsParameterStruct* params,
 		oss << params->outputName << "_" << params->datasetIdx << "_" << params->batchIdx;
 
 
-	params_->outputNameWithVersion = oss.str();	
+	params_->outputNameWithVersion = oss.str();
 
 	if (params->gotCreateArchive)
 	{
@@ -62,7 +62,7 @@ void MsClusterDataStorage::initialize(MsParameterStruct* params,
 #endif
 		createDirIfDoesNotExist(params_->archiveOutDir.c_str(), params->verboseLevel);
 	}
-	
+
 	if (params_->gotMergeArchives)
 	{
 		datFileManager_.initFromTwoArchives(params->datPaths1, params->datPaths2, config);
@@ -90,8 +90,8 @@ void MsClusterDataStorage::initialize(MsParameterStruct* params,
 
 	if (verboseLevel_>0)
 	{
-		cout << endl << "Found " << datFileManager_.getTotalSpectraToCluster() << 
-			" spectra, in " << datFileManager_.getDatFiles().size() << " dat files, precursor m/z range " << fixed << setprecision(2) << 
+		cout << endl << "Found " << datFileManager_.getTotalSpectraToCluster() <<
+			" spectra, in " << datFileManager_.getDatFiles().size() << " dat files, precursor m/z range " << fixed << setprecision(2) <<
 			datFileManager_.getMinMOverZ() << " - " << datFileManager_.getMaxMOverZ() << endl << endl;
 
 	}
@@ -112,7 +112,7 @@ size_t MsClusterDataStorage::findPosOfClusterWithMzAbove(mass_t mz, size_t start
 	if (nextClusterPos_==0)
 		return MAX_SIZE_T;
 
-	vector<Cluster>::const_iterator it = upper_bound(clusterAlloc_.begin() + startPos, 
+	vector<Cluster>::const_iterator it = upper_bound(clusterAlloc_.begin() + startPos,
 													 clusterAlloc_.begin() + nextClusterPos_-1,
 													 dummyCluster);
 	if (it == clusterAlloc_.end())
@@ -152,7 +152,7 @@ size_t MsClusterDataStorage::makeListOfSimilarities(size_t firstPosLower,  size_
 		if (lowerPosStart == higherPos)
 			continue;
 
-		assert(higherMz - clusterAlloc_[lowerPosStart].getClusterMOverZ() <= window); 
+		assert(higherMz - clusterAlloc_[lowerPosStart].getClusterMOverZ() <= window);
 		const clusterIdx_t lowestClusterIdx = clusterAlloc_[lowerPosStart].getClusterIdx();
 		for (size_t i=0; i<NUM_PEAKS_FOR_HEURISTIC; i++)
 		{
@@ -160,9 +160,9 @@ size_t MsClusterDataStorage::makeListOfSimilarities(size_t firstPosLower,  size_
 			const unsigned int idx          = higherPosCluster.topPeakIdxs_[i];
 			const clusterIdx_t higherPosIdx = higherPosCluster.getClusterIdx();
 			const size_t numHigerPosDistancePeaks = higherPosCluster.getDistancePeaks()->numPeaks;
-			const short	higherClusterArchiveSource = (higherPosCluster.getHeader()->getArchiveSource() != 0 ? 
+			const short	higherClusterArchiveSource = (higherPosCluster.getHeader()->getArchiveSource() != 0 ?
 													  higherPosCluster.getHeader()->getArchiveSource() : 999);
-			
+
 			assert(idx < newClusterIdxsLists_.size());
 
 			if (idx <= 1)	// idx can be 0 if the spectrum has very few peaks
@@ -188,9 +188,9 @@ size_t MsClusterDataStorage::makeListOfSimilarities(size_t firstPosLower,  size_
 					// at this mass we can skip this list
 					if (elementList[firstPosInList] >= higherPosIdx)
 						continue;
-					
+
 					assert( getCluster(elementList[firstPosInList])->getClusterMOverZ() + window >= higherMz);
-					
+
 					const  size_t lastPosInList = newClusterIdxsLists_[j]->getSize();
 					for (size_t k=firstPosInList; k<lastPosInList; k++)
 					{
@@ -220,7 +220,7 @@ size_t MsClusterDataStorage::makeListOfSimilarities(size_t firstPosLower,  size_
 				}
 			}
 		}
-		
+
 
 		// check if there are redundancies in the list, after adding all
 		// the pairs for the cluser, and remove them
@@ -261,7 +261,7 @@ void MsClusterDataStorage::computeMinSimilarityForJoiningFromLists(double mixedC
 	for (size_t i=lowerPos; i<=higherPos; i++)
 	{
 		if (counts[i] == 0) // value should already be 2.0 any way
-			continue; 
+			continue;
 
 		const float simVal = simModel_->computeMinSimilarityAllowed( clusterAlloc_[i].getDistancePeaks()->numPeaks,
 							    								    counts[i],
@@ -282,7 +282,7 @@ void MsClusterDataStorage::allocateMemory(float availableGB, bool verbose)
 {
 	if (sizeof(size_t)<8 && availableGB>3.2)
 		error("Cannot allocate more than 3.2 GB with this architecture because sizeof(size_t)<8");
-	
+
 	// assume that storage will take 85% of the memory, leave memory free for other runtime allocations
 	const size_t availableBytes    = static_cast<size_t>(1073741824.0 * availableGB * 0.86);
 	const size_t cost = 200*sizeof(Peak) + 2*sizeof(Cluster) + 2*sizeof(SingleSpectrumHeader);
@@ -301,7 +301,7 @@ void MsClusterDataStorage::allocateMemory(float availableGB, bool verbose)
 		cout << "This means that up to " << 2*n << " spectra can simlutaneously be evaluated." << endl << endl;
 	}
 
-	try 
+	try
 	{
 		headerAlloc_.resize(2*n); // original singletion headers are sttored here
 		peakAlloc_.resize(200*n);  // original singletion peaks are stored here
@@ -336,12 +336,12 @@ clusterIdx_t MsClusterDataStorage::addNewSpectra( mass_t window, clusterIdx_t* r
 	// first count space that is not filled towards the end of the allocated space
 	const clusterIdx_t clustersLeft = clusterAlloc_.size() - nextClusterPos_;
 	numSpectraNeeded = (clustersLeft >= numSpectraNeeded ? 0 : numSpectraNeeded - clustersLeft);
-	
+
 	const longInt8_t peaksLeft =  peakAlloc_.size() - nextPeakPos_;
 	numPeaksNeeded   = ( peaksLeft >= numPeaksNeeded ? 0 : numPeaksNeeded - peaksLeft);
 
 	// find the number of spectra that will actually have to be evacuated (shifted out of clusterAlloc_)
-	size_t numSpectraRequiredToFree =0; 
+	size_t numSpectraRequiredToFree =0;
 	if (numSpectraNeeded > 0 || numPeaksNeeded > 0)
 	{
 		size_t sumPeaks =0;
@@ -371,9 +371,9 @@ clusterIdx_t MsClusterDataStorage::addNewSpectra( mass_t window, clusterIdx_t* r
 	// the idx in clusterAlloc_ that will become 0 after the shifting
 	// At first we will consider freeing the required number of clusters
 	clusterIdx_t finalNumSpectraToFree = numSpectraFullyCompared;
-	
+
 	// check if we need to free more than we can
-	if (numSpectraRequiredToFree>0 && 
+	if (numSpectraRequiredToFree>0 &&
 		numSpectraFullyCompared <= numSpectraRequiredToFree)
 	{
 		// we will remove at most a 1/3 of the clusters that were not fully compared
@@ -385,8 +385,8 @@ clusterIdx_t MsClusterDataStorage::addNewSpectra( mass_t window, clusterIdx_t* r
 	}
 
 	assert(finalNumSpectraToFree ==0 || finalNumSpectraToFree < nextClusterPos_ );
-	
-	// shifts all the clusters, headers, etc. so the cluster in position 
+
+	// shifts all the clusters, headers, etc. so the cluster in position
 	// finalFreeIdx moves to position 0
 	shiftStorage(finalNumSpectraToFree, window);
 
@@ -409,8 +409,8 @@ clusterIdx_t MsClusterDataStorage::addNewSpectra( mass_t window, clusterIdx_t* r
 	// read spectra
 	size_t numSpectraReadFromDat = 0;
 	size_t numPeaksReadFromDat = 0;
-	datFileManager_.readSpectraToStorage(&headerAlloc_[nextClusterPos_], 
-										 &peakAlloc_[nextPeakPos_], 
+	datFileManager_.readSpectraToStorage(&headerAlloc_[nextClusterPos_],
+										 &peakAlloc_[nextPeakPos_],
 										 newSpectraStats,
 										 numSpectraReadFromDat,
 										 numPeaksReadFromDat);
@@ -418,7 +418,7 @@ clusterIdx_t MsClusterDataStorage::addNewSpectra( mass_t window, clusterIdx_t* r
 	assert( numSpectraReadFromDat == newSpectraStats.size() );
 	assert( nextClusterPos_ + newSpectraStats.size() <= clusterAlloc_.size());
 	assert( nextPeakPos_ + numPeaksReadFromDat <= peakAlloc_.size() );
-	
+
 	// create clusters
 	sort(newSpectraStats.begin(), newSpectraStats.end());
 	for (size_t i=0; i<newSpectraStats.size(); i++)
@@ -447,7 +447,7 @@ clusterIdx_t MsClusterDataStorage::addNewSpectra( mass_t window, clusterIdx_t* r
 			continue;
 		}
 
-		// if we are not assigning charges according to the values in the spectra, 
+		// if we are not assigning charges according to the values in the spectra,
 		// all charges should be 0
 		if (! params_->gotAssignCharges && header->getPeptideStr().length() == 0)
 		{
@@ -497,16 +497,16 @@ void MsClusterDataStorage::setMinSqsForSingleton(float sqsThreshold)
 		return;
 
 	assert(datFileManager_.getMaxMOverZ()>0.0 && datFileManager_.getMinMOverZ()>0.0);
-	const double spectrumDensity = (datFileManager_.getTotalSpectraToCluster() * 1000.0) / 
+	const double spectrumDensity = (datFileManager_.getTotalSpectraToCluster() * 1000.0) /
 		(datFileManager_.getMaxMOverZ() - datFileManager_.getMinMOverZ());
 
 	assert(spectrumDensity>= 0.0);
 	double logDiff = log10(spectrumDensity) - log10(50000.0);
 	if (logDiff<=0.0)
 		return;
-	
+
 	minSqsForSingleton_ = (1.25 + 1.15*logDiff) * sqsThreshold;
-	
+
 	// don't let it get too high...
 	if (minSqsForSingleton_ > 0.45)
 		minSqsForSingleton_ = 0.45;
@@ -616,10 +616,10 @@ size_t MsClusterDataStorage::writeRegularClustersToOutput(size_t n, size_t& numS
 		else
 			ossHeader << nameStr_ << "." << runningOutputIdx_++;
 
-			
+
 		// make consensus
-		if (cluster.getClusterSize()>1 && 
-			cluster.getSingletonVector() && 
+		if (cluster.getClusterSize()>1 &&
+			cluster.getSingletonVector() &&
 			cluster.getSingletonVector()->getSize()>0)
 		{
 			makeConsensus(&cluster, &clusterHeader);
@@ -635,7 +635,7 @@ size_t MsClusterDataStorage::writeRegularClustersToOutput(size_t n, size_t& numS
 		header->setTitle(ossHeader.str());
 
 		// make rest of cluster header line after the consensus
-		ossHeader << "\t" << cluster.getNumSingletonsIncludingSelf() << "\t" 
+		ossHeader << "\t" << cluster.getNumSingletonsIncludingSelf() << "\t"
 				  << cluster.clusterMOverZ_ << "\t" << cluster.clusterCharge_;
 		if (cluster.getHeader()->getPeptideStr().length()>1)
 		{
@@ -663,7 +663,7 @@ size_t MsClusterDataStorage::writeRegularClustersToOutput(size_t n, size_t& numS
 	{
 		if (clusterAlloc_[i].singletonIdxVector_)
 			clusterAlloc_[i].singletonIdxVector_->relinquish();
-	
+
 		if (clusterAlloc_[i].singletonDistancePeaks_)
 		{
 			delete clusterAlloc_[i].singletonDistancePeaks_;
@@ -724,7 +724,7 @@ bool MsClusterDataStorage::getClusterEntry(const Cluster& cluster, ClusterClustE
 
 	}
 
-	
+
 	clustEntry = it->second;
 	clustEntries_.erase(searchTitle);
 	return true;
@@ -776,10 +776,10 @@ size_t MsClusterDataStorage::writeMergedArchiveClustersToOutput(size_t n, size_t
 		// make title (look for existing title)
 		ossHeader.str(std::string());
 		ossHeader << existingTitle;
-			
+
 		// make consensus
-		if (cluster.getClusterSize()>1 && 
-			cluster.getSingletonVector() && 
+		if (cluster.getClusterSize()>1 &&
+			cluster.getSingletonVector() &&
 			cluster.getSingletonVector()->getSize()>0)
 		{
 			makeConsensus(&cluster, &clusterHeader);
@@ -818,7 +818,7 @@ size_t MsClusterDataStorage::writeMergedArchiveClustersToOutput(size_t n, size_t
 	{
 		if (clusterAlloc_[i].singletonIdxVector_)
 			clusterAlloc_[i].singletonIdxVector_->relinquish();
-	
+
 		if (clusterAlloc_[i].singletonDistancePeaks_)
 		{
 			delete clusterAlloc_[i].singletonDistancePeaks_;
@@ -834,7 +834,7 @@ size_t MsClusterDataStorage::writeMergedArchiveClustersToOutput(size_t n, size_t
 
 // shifts all relevant memory left (pushing away the clusters on the lower m/z range)
 // the sift is done to all storage vectors (peaks, headers, clusters, lists, etc.)
-// this (expensive) action is to be taken before a new m/z slice of spectra is added for 
+// this (expensive) action is to be taken before a new m/z slice of spectra is added for
 // clustering. Every cluster that is removed is outputed (to DAT and/or MGF)
 void  MsClusterDataStorage::shiftStorage(size_t posToMoveToZero, mass_t windowSize)
 {
@@ -843,7 +843,7 @@ void  MsClusterDataStorage::shiftStorage(size_t posToMoveToZero, mass_t windowSi
 
 	// first write clusters that are removed to the output
 	writeClustersToOutput(posToMoveToZero);
-	
+
 	const size_t numToShift = nextClusterPos_ - posToMoveToZero; // number of items that get shifted
 	if (numToShift > 0)
 	{
@@ -854,15 +854,15 @@ void  MsClusterDataStorage::shiftStorage(size_t posToMoveToZero, mass_t windowSi
 
 		// move the headers and clusters starting at position n.. n+numToShift-1
 		// to positions 0..numToShift-1
-		shuntInVector(headerAlloc_, posToMoveToZero, numToShift); 
+		shuntInVector(headerAlloc_, posToMoveToZero, numToShift);
 		shuntInVector(clusterAlloc_, posToMoveToZero, numToShift);
-	
+
 		// the singleton idx vector is still kept by the original cluster however, after
 		// shunting there are now two pointers to it. This is not good.
 		for (size_t i=numToShift; i<nextClusterPos_; i++)
 		{
 			headerAlloc_[i].setMOverZ(-1.0);
-			clusterAlloc_[i].singletonIdxVector_ = NULL; 
+			clusterAlloc_[i].singletonIdxVector_ = NULL;
 			clusterAlloc_[i].clusterSize_ = 0;
 			clusterAlloc_[i].indInPlay_   = false;
 			clusterAlloc_[i].singletonDistancePeaks_ = NULL;
@@ -881,7 +881,7 @@ void  MsClusterDataStorage::shiftStorage(size_t posToMoveToZero, mass_t windowSi
 	{
 		for (size_t i=0; i<nextClusterPos_; i++)
 		{
-			clusterAlloc_[i].singletonIdxVector_ = NULL; 
+			clusterAlloc_[i].singletonIdxVector_ = NULL;
 			clusterAlloc_[i].singletonDistancePeaks_ = NULL;
 			clusterAlloc_[i].clusterSize_ = 0;
 			clusterAlloc_[i].indInPlay_   = false;
@@ -922,7 +922,7 @@ void MsClusterDataStorage::UpdateClusterIdxsLists(clusterIdx_t minClusterIdx)
 // This struct is used to sort the lines in the cluster membership output
 struct ClusterMemberEntry {
 
-	ClusterMemberEntry() : singleton(0), datasetIdx(-1), fileIndexInList(-1), scanNumber(-1), 
+	ClusterMemberEntry() : singleton(0), datasetIdx(-1), fileIndexInList(-1), scanNumber(-1),
 							MOverZ(0), charge(0), title(0), peptide(0) {}
 
 	bool operator< (const ClusterMemberEntry& rhs) const
@@ -945,6 +945,7 @@ struct ClusterMemberEntry {
 	short charge;
 	const char* title;
 	const char* peptide;
+	float sqs;
 };
 
 
@@ -953,7 +954,7 @@ struct ClusterMemberEntry {
 // assumes that any singleton with a title at this stage is one from previous generations
 // so it parses the title to get the generation information and reports the title
 // returns number of lines in the oss
-size_t MsClusterDataStorage::makeClusterMembersStringAndSelectTitleAndPeptide(clusterIdx_t idx, 
+size_t MsClusterDataStorage::makeClusterMembersStringAndSelectTitleAndPeptide(clusterIdx_t idx,
 					ostringstream& oss, const char*& existingTitle, string& maximalPeptide) const
 {
 	oss.str(std::string());
@@ -963,23 +964,23 @@ size_t MsClusterDataStorage::makeClusterMembersStringAndSelectTitleAndPeptide(cl
 	const Cluster& cluster = clusterAlloc_[idx - firstClusterIdx];
 	assert(idx == cluster.getClusterIdx());
 
-	const clusterIdx_t* singltonIdxs = (cluster.singletonIdxVector_ ? 
+	const clusterIdx_t* singltonIdxs = (cluster.singletonIdxVector_ ?
 		cluster.singletonIdxVector_->getElementsPtr() : 0);
-	const size_t numSingletons       = (cluster.singletonIdxVector_ ? 
+	const size_t numSingletons       = (cluster.singletonIdxVector_ ?
 		cluster.singletonIdxVector_->getSize() : 0);
 
-	
+
 
 	// special (easy) case if there are no additional singletons (no sorting needed)
 	if (numSingletons == 0)
 	{
 		const SingleSpectrumHeader* header = cluster.getHeader();
 		const int headerDatasetIndex = header->getDatasetIndex();
-		
-		oss << (headerDatasetIndex >= 0 ? headerDatasetIndex : datasetIdx_ )<< "\t" 
+
+		oss << (headerDatasetIndex >= 0 ? headerDatasetIndex : datasetIdx_ )<< "\t"
 			<< header->getSpectraFileIndexInList() << "\t"
 			<< header->getScanNumber() << "\t";
-		
+
 		if (params_->gotCorrectPM)
 		{
 			const mass_t deltaMz = fabs(header->getOriginalPmWith19() - header->getMOverZ());
@@ -991,7 +992,8 @@ size_t MsClusterDataStorage::makeClusterMembersStringAndSelectTitleAndPeptide(cl
 		oss << header->getMOverZ() << "\t1.0\t0\t" << cluster.clusterCharge_ ;
 		if (header->getPeptideStr().length()>1)
 			oss << "\t" << header->getPeptideStr();
-
+		//added to output sqs
+		oss << "\t" << header->getSqs();
 		oss << endl << endl;
 		return 1;
 	}
@@ -1019,6 +1021,7 @@ size_t MsClusterDataStorage::makeClusterMembersStringAndSelectTitleAndPeptide(cl
 		members[i].MOverZ		   = singletonHeader->getMOverZ();
 		members[i].charge		   = singletonHeader->getCharge();
 		members[i].title		   = (singletonHeader->getTitle().length()>1 ? singletonHeader->getTitle().c_str() : NULL);
+		members[i].sqs				 = singletonHeader->getSqs();
 
 		const string& peptideStr = singletonHeader->getPeptideStr();
 		if (peptideStr.length()>=1)
@@ -1026,7 +1029,7 @@ size_t MsClusterDataStorage::makeClusterMembersStringAndSelectTitleAndPeptide(cl
 			members[i].peptide		   = peptideStr.c_str();
 			peptideCounts[peptideStr]++;
 		}
-	
+
 		// hack return the orginal m/z if there was correction (so data doesn't look funny)
 		if (params_->gotCorrectPM)
 		{
@@ -1035,14 +1038,14 @@ size_t MsClusterDataStorage::makeClusterMembersStringAndSelectTitleAndPeptide(cl
 			members[i].MOverZ = singletonHeader->getOriginalPmWith19();
 		}
 	}
-	
+
 	sort(members.begin(), members.end());
 
 	// create the string
 	for (size_t i=0; i<members.size(); i++)
 	{
 		oss << members[i].datasetIdx << "\t" << members[i].fileIndexInList << "\t" << members[i].scanNumber << "\t" << members[i].MOverZ;
-		
+
 		// output similarity to consensus and the p-value
 		const float similarity = computeSimilarity(cluster.getDistancePeaks(), members[i].singleton->getSingletonPeaks(), Cluster::getPeakIndexToleranceAsInt());
 		const float pvalue	   = simModel_->computePValue(cluster.getDistancePeaks()->numPeaks, members[i].singleton->getNumSimilarityPairs(), similarity);
@@ -1057,6 +1060,7 @@ size_t MsClusterDataStorage::makeClusterMembersStringAndSelectTitleAndPeptide(cl
 		oss << "\t" << members[i].charge;
 		if (members[i].peptide)
 			oss << "\t" << members[i].peptide;
+			oss << "\t" << members[i].sqs;
 		oss << endl;
 	}
 	oss << endl;
@@ -1083,7 +1087,7 @@ size_t MsClusterDataStorage::makeClusterMembersStringAndSelectTitleAndPeptide(cl
 
 
 
-size_t MsClusterDataStorage::makeClustMemberStringForMergedClusters(const Cluster& cluster, 
+size_t MsClusterDataStorage::makeClustMemberStringForMergedClusters(const Cluster& cluster,
 											ostringstream& oss, string& existingTitle, string& maximalPeptide, bool verbose)
 {
 	const clusterIdx_t idx = cluster.getClusterIdx();
@@ -1283,7 +1287,7 @@ void MsClusterDataStorage::selectDistancePeaksFromMultipleSigneltons(Cluster* cl
 	static vector<DistancePeak>  tmpPeakArea;
 	static vector<unsigned char> peakCounts;
 	static vector<float>		 ratios;(256);
-	
+
 	if (cluster->clusterSize_ <= 1 || cluster->clusterSize_>255)
 		return;
 
@@ -1326,9 +1330,9 @@ void MsClusterDataStorage::selectDistancePeaksFromMultipleSigneltons(Cluster* cl
 			// join peaks with proportion to their intensities
 			const intensity_t intensitySum =(tmpPeakArea[prev].intensity + allPeaks[i].intensity);
 			const float		  ratio = tmpPeakArea[prev].intensity/intensitySum;
-			const mass_t newMass = ratio * convertIntToMass(tmpPeakArea[prev].massAsInt) + 
+			const mass_t newMass = ratio * convertIntToMass(tmpPeakArea[prev].massAsInt) +
 				                   (1.0-ratio) * convertIntToMass(allPeaks[i].massAsInt);
-			
+
 			tmpPeakArea[prev].intensity = intensitySum;
 			tmpPeakArea[prev].massAsInt = convertMassToInt(newMass);
 			peakCounts[prev]+=peakCounts[i];
@@ -1347,17 +1351,17 @@ void MsClusterDataStorage::selectDistancePeaksFromMultipleSigneltons(Cluster* cl
 	// modify the intensity according to the peakWeightTable_
 	// that is discount the weight of peaks that have only a few copies
 	for (int i=0; i<totalPeaks; i++)
-		tmpPeakArea[i].intensity = tmpPeakArea[i].intensity * 
+		tmpPeakArea[i].intensity = tmpPeakArea[i].intensity *
 			peakWeightTable_.getWeight(static_cast<int>(peakCounts[i]),static_cast<int>(cluster->clusterSize_));
 
 	// select a number of peaks according to their intensity
 	sort(tmpPeakArea.begin(), tmpPeakArea.begin()+totalPeaks, compIntensity);
 
 	memcpy(cluster->distancePeaks_.peaks, &tmpPeakArea[0], cluster->distancePeaks_.numPeaks * sizeof(DistancePeak));
-	
+
 	// sort according to mass
 	sort(cluster->distancePeaks_.peaks, cluster->distancePeaks_.peaks + cluster->distancePeaks_.numPeaks);
-	
+
 	// set new adjusted intensity
 	cluster->setAdjustedIntensities();
 }
@@ -1369,7 +1373,7 @@ Stores the peaks in the local static allocation.
 (this destroys the original peak list pointer, so it should be backed up
 if this information is still needed).
 ***************************************************************************/
-void MsClusterDataStorage::makeConsensus(Cluster* cluster, 
+void MsClusterDataStorage::makeConsensus(Cluster* cluster,
 										 SingleSpectrumHeader* clusterHeader)
 {
 	if (cluster->clusterSize_ <= 1 || ! cluster->singletonIdxVector_ )
@@ -1402,7 +1406,7 @@ void MsClusterDataStorage::makeConsensus(Cluster* cluster,
 }
 
 
-void MsClusterDataStorage::makeConsensusForSmallCluster(Cluster* cluster, 
+void MsClusterDataStorage::makeConsensusForSmallCluster(Cluster* cluster,
 														SingleSpectrumHeader* clusterHeader,
 														bool	indSetConsensusParameters)
 {
@@ -1440,7 +1444,7 @@ void MsClusterDataStorage::makeConsensusForSmallCluster(Cluster* cluster,
 			Peak& peak = tmpPeakArea[j];
 			peak=cluster->peaks_[j];
 			peak.intensity *= ratio;
-		}							   
+		}
 	}
 	else
 		memcpy(&tmpPeakArea[0], cluster->peaks_, cluster->numPeaks_*sizeof(Peak));
@@ -1448,7 +1452,7 @@ void MsClusterDataStorage::makeConsensusForSmallCluster(Cluster* cluster,
 	p+= cluster->numPeaks_;
 
 	// these vectors are filled and used for the function adjustMaxPossiblePeakCounts
-	// which sets for each peak the maximal number of spectra in which it had the 
+	// which sets for each peak the maximal number of spectra in which it had the
 	// potential to appear
 	vector<MassCount> minMassCounts(numSingletons+1), maxMassCounts(numSingletons+1);
 	clusterIdx_t totalMassCounts=0;
@@ -1482,7 +1486,7 @@ void MsClusterDataStorage::makeConsensusForSmallCluster(Cluster* cluster,
 			memcpy(&tmpPeakArea[p], singleton->peaks_, sizeof(Peak)*numPeaks);
 
 		p+=numPeaks;
-	
+
 		const clusterIdx_t size = singleton->getHeader()->getClusterSize(); // use this since it is the original size
 		minMassCounts[i].mass   = singleton->getPeak(0).mass;
 		minMassCounts[i].numSpectra = size;
@@ -1513,7 +1517,7 @@ void MsClusterDataStorage::makeConsensusForSmallCluster(Cluster* cluster,
 		}
 		assert(totalMassCounts == cluster->clusterSize_);
 	}
-	
+
 	// sort peaks and assign them to cluster
 	sort(tmpPeakArea.begin(), tmpPeakArea.begin()+p);
 
@@ -1524,7 +1528,7 @@ void MsClusterDataStorage::makeConsensusForSmallCluster(Cluster* cluster,
 	// counts and maxPosisble fields in peaks should be added (so paramter true is given)
 	cluster->joinAdjacentPeaks(config_->getTolerance() ,true);
 
-	// convert the min/max counts to counts of the number of spectra that have peaks 
+	// convert the min/max counts to counts of the number of spectra that have peaks
 	// at a given mass
 	sort(minMassCounts.begin(), minMassCounts.end());
 	for (size_t i=1; i<minMassCounts.size(); i++)
@@ -1543,12 +1547,12 @@ void MsClusterDataStorage::makeConsensusForSmallCluster(Cluster* cluster,
 	for (size_t i=0; i<cluster->numPeaks_; i++)
 	{
 		Peak& peak = cluster->peaks_[i];
-		const float ratio =  peakWeightTable_.getWeight(static_cast<int>(peak.count), 
+		const float ratio =  peakWeightTable_.getWeight(static_cast<int>(peak.count),
 													    static_cast<int>(peak.maxPossible));
 		peak.intensity *= ratio;
 		totalPeakIntnesity += peak.intensity;
 	}
-	
+
 
 	// normalize peak intensity according to cluster size
 	if (cluster->getClusterSize()>=1 && totalPeakIntnesity>0.0)
@@ -1556,7 +1560,7 @@ void MsClusterDataStorage::makeConsensusForSmallCluster(Cluster* cluster,
 		const intensity_t norm = (1000.0 * cluster->getClusterSize())/totalPeakIntnesity;
 		for (size_t i=0; i<cluster->numPeaks_; i++)
 			cluster->peaks_[i].intensity *= norm;
-		
+
 		// don't let this peak get filtered out, might cause problems with first peak mass in header
 		if (cluster->peaks_[0].intensity < 0.001)
 			cluster->peaks_[0].intensity = 0.001;
@@ -1610,7 +1614,7 @@ void MsClusterDataStorage::makeConsensusForLargeCluster(Cluster* cluster, Single
 	size_t totalSize = tmpCluster.getHeader()->getClusterSize();
 	assert(totalSize>0 && totalSize < sizeOfLarge);
 
-	// start adding clusters, until we add one that leads to a size that is too large 
+	// start adding clusters, until we add one that leads to a size that is too large
 	for (size_t i=0; i<numSingletons; i++)
 	{
 		const Cluster* singleton = getCluster(singletonIdxs[i]);
@@ -1651,7 +1655,7 @@ void MsClusterDataStorage::setConsensusParameters(Cluster* cluster, SingleSpectr
 		clusterHeader = const_cast<SingleSpectrumHeader*>(cluster->getHeader());
 
 	clusterHeader->setClusterSize(cluster->getClusterSize());
-	
+
 	const AllocatedVector<clusterIdx_t>* singletonVector = cluster->getSingletonVector();
 	const clusterIdx_t* singletonIdxs  = singletonVector->getElementsPtr();
 	const size_t		numSingletons  = singletonVector->getSize();
@@ -1804,7 +1808,7 @@ bool MsClusterDataStorage::testSingletonsWithGoodMzs(const Cluster* cluster, mas
 		for (size_t i=0; i<numSingletons; i++)
 		{
 			const Cluster* singleton = getCluster(singletonIdxs[i]);
-			
+
 			assert(singleton && ! singleton->getIndInPlay());
 			assert(singleton->getAssignedClusterIdx() == cluster->getClusterIdx());
 			assert(singleton->getClusterMOverZ() == singleton->getHeader()->getMOverZ());
@@ -1828,7 +1832,7 @@ bool MsClusterDataStorage::testSingletonsWithGoodMzs(const Cluster* cluster, mas
 		for (size_t i=0; i<numSingletons; i++)
 		{
 			const Cluster* singleton = getCluster(singletonIdxs[i]);
-			
+
 			assert(singleton && ! singleton->getIndInPlay());
 			assert(singleton->getAssignedClusterIdx() == cluster->getClusterIdx());
 			assert(singleton->getClusterMOverZ() == singleton->getHeader()->getMOverZ());
@@ -1839,11 +1843,3 @@ bool MsClusterDataStorage::testSingletonsWithGoodMzs(const Cluster* cluster, mas
 	}
 	return (maxMz-minMz<15.0);
 }
-
-
-
-
-
-
-
-
