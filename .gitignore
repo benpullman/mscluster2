@@ -28,9 +28,11 @@
 *.app
 
 datalist.txt
+data
 out
 tmp
-MSCluster_bin*
+/MSCluster_bin
+/MSCluster_bin.*
 src/MLlib/mllib
 src/MsCluster/MSCluster_bin
 .DS_Store
