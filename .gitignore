@@ -33,3 +33,4 @@ tmp
 MSCluster_bin*
 src/MLlib/mllib
 src/MsCluster/MSCluster_bin
+.DS_Store
