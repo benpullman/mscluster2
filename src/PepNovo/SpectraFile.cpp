@@ -401,6 +401,16 @@ int SpectraFile::scanMzxmlFile(const char* filePath, int datasetIdx, int fileInd
 
 		char* chargeStr = strstr(precursorMzStr, "precursorCharge=");
 
+		if (!chargeStr)
+				{
+					// cout << "Warninig: bad parsing of charge from mzxml! " << endl;
+					// cout << precursorMzStr <<endl;
+					// cout << "Scan: " << scanNumber << "  Pos: " << currentFilePos << endl;
+					scanStartPtr += 50;
+					continue;
+
+				}
+
 		const int charge = parseIntFromXml(chargeStr);
 
 		precursorMzStr = strstr(precursorMzStr, ">");
